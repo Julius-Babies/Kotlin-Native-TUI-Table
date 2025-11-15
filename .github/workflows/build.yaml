@@ -43,7 +43,9 @@ jobs:
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
       - name: Update README.md Version number
-        run: sed -i "s/§§VERSION§§/${{ github.ref_name }}/g" README.md
+        run: |
+          cp .github/default_readme.md README.md
+          sed -i "s/§§VERSION§§/${{ github.ref_name }}/g" README.md
       - name: Commit and Push changes
         run: |
           git add README.md
