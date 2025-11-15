@@ -4,9 +4,11 @@ plugins {
 
     alias(libs.plugins.kotest)
     alias(libs.plugins.ksp)
+
+    alias(libs.plugins.maven.publish)
 }
 
-group = "me.user"
+group = "io.github.julius-babies"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -42,6 +44,31 @@ kotlin {
         nativeTest.dependencies {
             implementation(libs.kotest.framework.engine)
             implementation(libs.kotest.assertions.core)
+        }
+    }
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+    coordinates(project.group.toString(), project.name, project.version.toString())
+
+    pom {
+        name = "table-tui"
+        description = "A simple tui table library for Kotlin/Native"
+        url = "https://github.com/Julius-Babies/Kotlin-Native-TUI-Table"
+
+        developers {
+            developer {
+                id = "julius-vincent-babies"
+                name = "Julius Vincent Babies"
+                email = "julvin.babies@gmail.com"
+                url = "https://github.com/Julius-Babies"
+            }
+        }
+
+        scm {
+            url = "https://github.com/Julius-Babies/Kotlin-Native-TUI-Table"
         }
     }
 }
