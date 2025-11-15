@@ -43,6 +43,49 @@ class SimpleTableTest : FunSpec({
 │ 3  │ Doe  │ 25  │
 └────┴──────┴─────┘"""
     }
+
+    test("simple table with padding") {
+        val table = buildTable {
+            cellPadding = 2
+            row {
+                cell {
+                    +"ID"
+                }
+                cell {
+                    +"Name"
+                }
+                cell {
+                    +"Age"
+                }
+            }
+
+            people.forEach {
+                row {
+                    cell {
+                        +it.id
+                    }
+
+                    cell {
+                        +it.name
+                    }
+
+                    cell {
+                        +it.age.toString()
+                    }
+                }
+            }
+        }
+
+        table shouldBe """┌──────┬────────┬───────┐
+│  ID  │  Name  │  Age  │
+├──────┼────────┼───────┤
+│  1   │  John  │  20   │
+├──────┼────────┼───────┤
+│  2   │  Jane  │  22   │
+├──────┼────────┼───────┤
+│  3   │  Doe   │  25   │
+└──────┴────────┴───────┘"""
+    }
 })
 
 data class Person(val id: String, val name: String, val age: Int)
