@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.github.julius-babies"
-version = "1.0-SNAPSHOT"
+version = System.getenv("VERSION")?.ifBlank { null } ?: "unspecified"
 
 repositories {
     mavenCentral()
