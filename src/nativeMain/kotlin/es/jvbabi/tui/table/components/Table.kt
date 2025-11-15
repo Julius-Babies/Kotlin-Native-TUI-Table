@@ -1,26 +1,6 @@
-class Cell {
-    var content: String = ""
+package es.jvbabi.tui.table.components
 
-    operator fun String.unaryPlus() {
-        content += this
-    }
-}
-
-class Row {
-    val cells = mutableListOf<Cell>()
-
-    fun cell(block: Cell.() -> Unit) {
-        val cell = Cell()
-        cell.apply(block)
-        cells.add(cell)
-    }
-
-    override fun toString(): String {
-        return "RowBuilder()"
-    }
-}
-
-class Table {
+class Table internal constructor() {
 
     private val rows = mutableListOf<Row>()
     var cellPadding = 1
@@ -88,32 +68,4 @@ class Table {
             }
         }
     }
-}
-
-fun buildTable(block: Table.() -> Unit): String {
-    val builder = Table()
-    builder.apply(block)
-    return builder.toString()
-}
-
-fun main() {
-    buildTable {
-        row {
-            cell {
-                +"ID"
-            }
-            cell {
-                +"Name"
-            }
-        }
-
-        row {
-            cell {
-                +"1"
-            }
-            cell {
-                +"Albert"
-            }
-        }
-    }.let(::println)
 }

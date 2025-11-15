@@ -30,3 +30,20 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
           VERSION: ${{ github.ref_name }}
+  update_readme:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Init git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+      - name: Update README.md Version number
+        run: sed -i "s/§§VERSION§§/${{ github.ref_name }}/g" README.md
+      - name: Commit and Push changes
+        run: |
+          git add README.md
+          git commit -m "chore: Bump version to ${{ github.ref_name }} (automated)"
+          git push
