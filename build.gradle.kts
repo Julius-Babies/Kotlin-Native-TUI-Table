@@ -70,5 +70,12 @@ mavenPublishing {
         scm {
             url = "https://github.com/Julius-Babies/Kotlin-Native-TUI-Table"
         }
+
+        licenses {
+            license {
+                name = "The MIT License (MIT)"
+                url = "https://opensource.org/license/MIT"
+            }
+        }
     }
 }
