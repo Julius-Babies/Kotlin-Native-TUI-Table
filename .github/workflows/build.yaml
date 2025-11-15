@@ -45,7 +45,7 @@ jobs:
       - name: Update README.md Version number
         run: |
           cp .github/default_readme.md README.md
-          sed -i "s/§§VERSION§§/${{ github.ref_name }}/g" README.md
+          sed -i "s/§§VERSIONTAG§§/${{ github.ref_name }}/g" README.md
       - name: Commit and Push changes
         run: |
           git add README.md
