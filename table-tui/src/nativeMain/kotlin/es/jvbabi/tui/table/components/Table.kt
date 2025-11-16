@@ -69,6 +69,65 @@ class Table internal constructor() {
             }
         }
 
+        // Precompute, for each content row, where vertical borders exist at column boundaries.
+        // A mask has size columnCount + 1 representing boundaries: 0 (left edge) ... columnCount (right edge).
+        val verticalMasks: List<BooleanArray> = buildList(normalizedRows.size) {
+            normalizedRows.forEach { row ->
+                val mask = BooleanArray(columnCount + 1)
+                var boundary = 0
+                mask[boundary] = true // left edge is always a vertical border
+                row.forEach { cell ->
+                    boundary += maxOf(1, cell.colspan)
+                    // Vertical border at the end of the spanned cell
+                    mask[boundary] = true
+                }
+                add(mask)
+            }
+        }
+
+        fun StringBuilder.drawAdaptiveSeparator(upperMask: BooleanArray, lowerMask: BooleanArray) {
+            // left edge
+            append(border.leftJoint)
+            // segments and joints between them
+            for (i in 0 until columnCount) {
+                val segmentWidth = colWidths[i] + 2 * cellPadding
+                repeat(segmentWidth) { append(border.horizontal) }
+                if (i == columnCount - 1) {
+                    append(border.rightJoint)
+                } else {
+                    val boundaryIndex = i + 1 // boundary between column i and i+1
+                    val up = upperMask[boundaryIndex]
+                    val down = lowerMask[boundaryIndex]
+                    val joint = when {
+                        up && down -> border.middleJoint
+                        up && !down -> border.bottomJoint
+                        !up && down -> border.topJoint
+                        else -> border.horizontal // continue horizontal if neither side has a vertical
+                    }
+                    append(joint)
+                }
+            }
+        }
+
+        // Bottom border that adapts to the verticals present in the last content row.
+        // Where the last row has a vertical at a boundary, we draw a bottomJoint (┴),
+        // otherwise we continue the horizontal line (─) through that boundary.
+        fun StringBuilder.drawAdaptiveBottom(lastRowMask: BooleanArray) {
+            append(border.bottomLeft)
+            for (i in 0 until columnCount) {
+                val segmentWidth = colWidths[i] + 2 * cellPadding
+                repeat(segmentWidth) { append(border.horizontal) }
+                if (i == columnCount - 1) {
+                    append(border.bottomRight)
+                } else {
+                    val boundaryIndex = i + 1
+                    val hasVerticalAbove = lastRowMask[boundaryIndex]
+                    val joint = if (hasVerticalAbove) border.bottomJoint else border.horizontal
+                    append(joint)
+                }
+            }
+        }
+
         return buildString {
             // Top border
             drawBorder(border.topLeft, border.topJoint, border.topRight)
@@ -100,15 +159,18 @@ class Table internal constructor() {
 
                 if (rowIndex < normalizedRows.lastIndex) {
                     appendLine()
-                    // Separator
-                    drawBorder(border.leftJoint, border.middleJoint, border.rightJoint)
+                    // Adaptive separator considering verticals in rows above/below (handles colspans)
+                    val upperMask = verticalMasks[rowIndex]
+                    val lowerMask = verticalMasks[rowIndex + 1]
+                    drawAdaptiveSeparator(upperMask, lowerMask)
                     appendLine()
                 }
             }
 
-            // Bottom border
+            // Bottom border (adaptive to last row's vertical boundaries)
             appendLine()
-            drawBorder(border.bottomLeft, border.bottomJoint, border.bottomRight)
+            val lastMask = verticalMasks.last()
+            drawAdaptiveBottom(lastMask)
         }
     }
 }
