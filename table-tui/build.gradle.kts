@@ -37,6 +37,10 @@ kotlin {
     }
 }
 
+tasks.withType<PublishToMavenRepository> {
+    dependsOn(tasks.withType<Test>())
+}
+
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
