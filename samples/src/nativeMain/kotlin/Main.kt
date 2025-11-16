@@ -18,6 +18,7 @@ fun main() {
             cell { +"1" }
             cell {
                 colspan = 2
+                centered = true
                 +"John"
             }
         }

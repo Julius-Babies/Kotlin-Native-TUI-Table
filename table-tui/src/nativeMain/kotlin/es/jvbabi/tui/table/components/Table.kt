@@ -146,12 +146,23 @@ class Table internal constructor() {
                     val skippedSeparators = (span - 1)
                     val spanInnerWidth = innerByColumns + skippedSeparators
 
-                    // left padding of the (single) spanned cell
-                    repeat(cellPadding) { append(' ') }
-                    append(cell.content)
-                    // fill the rest of the spanned area (includes right padding and any extra space)
-                    val remaining = spanInnerWidth - cellPadding - cell.content.length
-                    repeat(maxOf(0, remaining)) { append(' ') }
+                    // Berechne linke/rechte Auffüllung je nach Ausrichtung
+                    val baseLeftPad = cellPadding
+                    val baseRightPad = cellPadding
+                    val freeSpace = spanInnerWidth - cell.content.length - baseLeftPad - baseRightPad
+                    if (cell.centered) {
+                        val extraLeft = maxOf(0, freeSpace / 2)
+                        val extraRight = maxOf(0, freeSpace - extraLeft)
+                        repeat(baseLeftPad + extraLeft) { append(' ') }
+                        append(cell.content)
+                        repeat(baseRightPad + extraRight) { append(' ') }
+                    } else {
+                        // Standard: links nur Padding, rest nach rechts
+                        repeat(baseLeftPad) { append(' ') }
+                        append(cell.content)
+                        val remaining = baseRightPad + maxOf(0, freeSpace)
+                        repeat(remaining) { append(' ') }
+                    }
                     // vertical border at the end of the span
                     append(border.vertical)
                     cIndex += span
