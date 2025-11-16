@@ -80,13 +80,19 @@ class Table internal constructor() {
                 var cIndex = 0
                 row.forEach { cell ->
                     val span = maxOf(1, cell.colspan)
-                    val spanWidth = (0 until span).sumOf { colWidths[cIndex + it] } + 2 * cellPadding
-                    // left padding
+                    // Inner width of the spanned cell should cover:
+                    // - the inner widths of each spanned column (colWidth + 2*padding)
+                    // - plus the widths of the skipped internal vertical separators (span - 1)
+                    val innerByColumns = (0 until span).sumOf { colWidths[cIndex + it] + 2 * cellPadding }
+                    val skippedSeparators = (span - 1)
+                    val spanInnerWidth = innerByColumns + skippedSeparators
+
+                    // left padding of the (single) spanned cell
                     repeat(cellPadding) { append(' ') }
                     append(cell.content)
-                    // right padding and remaining spaces inside the spanned area
-                    val remaining = spanWidth - cellPadding - cell.content.length
-                    repeat(remaining) { append(' ') }
+                    // fill the rest of the spanned area (includes right padding and any extra space)
+                    val remaining = spanInnerWidth - cellPadding - cell.content.length
+                    repeat(maxOf(0, remaining)) { append(' ') }
                     // vertical border at the end of the span
                     append(border.vertical)
                     cIndex += span

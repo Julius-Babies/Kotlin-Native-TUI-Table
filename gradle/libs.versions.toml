@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.21"
+kotlin = "2.2.21" # Remember to change the version in settings.grtadle.kts as well
 kotlinxSerialization = "1.9.0"
 
 kotest = "6.0.4"
