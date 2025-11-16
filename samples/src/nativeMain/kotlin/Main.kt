@@ -1,17 +1,14 @@
 import es.jvbabi.tui.table.buildTable
+import es.jvbabi.tui.table.components.Table
 
 fun main() {
     val table = buildTable {
+        cellPadding = 2
+
         row {
-            cell {
-                +"ID"
-            }
-            cell {
-                +"Name"
-            }
-            cell {
-                +"Age"
-            }
+            cell { +"ID" }
+            cell { +"Details" }
+            cell { +"Status" }
         }
 
         row {
@@ -19,7 +16,16 @@ fun main() {
             cell {
                 colspan = 2
                 centered = true
-                +"John"
+                +"No data available"
+            }
+        }
+
+        row {
+            cell { +"2" }
+            cell { +"Item A" }
+            cell {
+                centered = true
+                +"✓"
             }
         }
     }
