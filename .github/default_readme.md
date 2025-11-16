@@ -119,7 +119,13 @@ println(table)
 
 **Output:**
 ```
-[Placeholder: Basic table output with header and data rows]
+┌────┬──────┬─────┐
+│ ID │ Name │ Age │
+├────┼──────┼─────┤
+│ 1  │ John │ 20  │
+├────┼──────┼─────┤
+│ 2  │ Jane │ 22  │
+└────┴──────┴─────┘
 ```
 
 </details>
@@ -151,7 +157,11 @@ println(table)
 
 **Output:**
 ```
-[Placeholder: Table with increased padding around cell content]
+┌──────┬────────┬───────┐
+│  ID  │  Name  │  Age  │
+├──────┼────────┼───────┤
+│  1   │  John  │  20   │
+└──────┴────────┴───────┘
 ```
 
 </details>
@@ -185,7 +195,11 @@ println(table)
 
 **Output:**
 ```
-[Placeholder: Table showing a cell spanning multiple columns]
+┌────┬───────┬─────┬──────────┐
+│ ID │ Name  │ Age │ Address  │
+├────┼───────┴─────┼──────────┤
+│ 1  │ John Doe    │ New York │
+└────┴─────────────┴──────────┘
 ```
 
 </details>
@@ -218,7 +232,11 @@ println(table)
 
 **Output:**
 ```
-[Placeholder: Table with centered cell content]
+┌────┬──────┬────────┐
+│ ID │ Name │ Status │
+├────┼──────┼────────┤
+│ 1  │ John │ Active │
+└────┴──────┴────────┘
 ```
 
 </details>
@@ -261,7 +279,11 @@ println(table)
 
 **Output:**
 ```
-[Placeholder: Table with custom double-line borders]
+╔════╦══════╗
+║ ID ║ Name ║
+╠════╬══════╣
+║ 1  ║ John ║
+╚════╩══════╝
 ```
 
 </details>
@@ -305,7 +327,13 @@ println(table)
 
 **Output:**
 ```
-[Placeholder: Complex table with multiple features combined]
+┌──────┬───────────────┬──────────┐
+│  ID  │  Details      │  Status  │
+├──────┼───────────────┴──────────┤
+│  1   │    No data available     │
+├──────┼───────────────┬──────────┤
+│  2   │  Item A       │    ✓     │
+└──────┴───────────────┴──────────┘
 ```
 
 </details>
@@ -322,11 +350,6 @@ val table = buildTable {
 
 println(table)  // Prints nothing
 println(table == "")  // true
-```
-
-**Output:**
-```
-[Placeholder: Empty output - no table rendered]
 ```
 
 </details>
