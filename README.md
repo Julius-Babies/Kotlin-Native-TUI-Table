@@ -7,8 +7,6 @@ A lightweight, intuitive DSL for creating beautiful text-based tables in Kotlin/
 Create a simple table using the DSL:
 
 ```kotlin
-import es.jvbabi.tui.table.buildTable
-
 val table = buildTable {
     row {
         cell { +"ID" }
@@ -56,14 +54,14 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.julius-babies:table-tui:v0.0.7")
+    implementation("io.github.julius-babies:table-tui:v0.0.8")
 }
 ```
 
 #### Version Catalog
 ```toml
 [versions]
-table-tui = "v0.0.7"
+table-tui = "v0.0.8"
 
 [libraries]
 table-tui = { module = "io.github.julius-babies:table-tui", version.ref = "table-tui" }
@@ -80,8 +78,6 @@ dependencies {
 Import the `buildTable` function and start creating tables:
 
 ```kotlin
-import es.jvbabi.tui.table.buildTable
-
 val table = buildTable {
     row {
         cell { +"Hello" }
@@ -242,26 +238,14 @@ println(table)
 </details>
 
 <details>
-<summary><b>Custom Border Styles</b></summary>
+<summary><b>Border Styles</b></summary>
 
-Customize the appearance of table borders with different characters.
+Choose from predefined border styles: `Default`, `Double`, or `Borderless`.
 
 ```kotlin
 val table = buildTable {
-    // Customize border characters
-    border = Table.BorderStyle(
-        topLeft = '╔',
-        topRight = '╗',
-        bottomLeft = '╚',
-        bottomRight = '╝',
-        horizontal = '═',
-        vertical = '║',
-        topJoint = '╦',
-        middleJoint = '╬',
-        leftJoint = '╠',
-        rightJoint = '╣',
-        bottomJoint = '╩'
-    )
+    // Use a predefined style
+    border = BorderStyle.Double
     
     row {
         cell { +"ID" }
@@ -284,6 +268,17 @@ println(table)
 ╠════╬══════╣
 ║ 1  ║ John ║
 ╚════╩══════╝
+```
+
+You can also hide all borders:
+
+```kotlin
+val table = buildTable {
+    border = BorderStyle.Borderless
+    row { cell { +"Hello" }; cell { +"World" } }
+}
+
+println(table) // prints just the cell contents separated by spaces
 ```
 
 </details>
@@ -368,7 +363,7 @@ This library supports the following Kotlin/Native targets:
 
 - `buildTable { ... }` - Creates a table and returns its string representation
 - `cellPadding: Int` - Sets the padding around cell content (default: 1)
-- `border: BorderStyle` - Customizes the border characters
+- `border: BorderStyle` - Selects the border style (`Default`, `Double`, `Borderless`)
 
 ### Row DSL
 
