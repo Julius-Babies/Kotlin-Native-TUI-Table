@@ -43,7 +43,9 @@ tasks.withType<PublishToMavenRepository> {
 
 mavenPublishing {
     publishToMavenCentral()
-    signAllPublications()
+    if (!gradle.startParameter.taskNames.any { it.contains("publishToMavenLocal") }) {
+        signAllPublications()
+    }
     coordinates(project.group.toString(), project.name, project.version.toString())
 
     pom {
