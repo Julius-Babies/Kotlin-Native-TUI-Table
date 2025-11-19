@@ -5,21 +5,7 @@ class Table internal constructor() {
     private val rows = mutableListOf<Row>()
     var cellPadding = 1
 
-    data class BorderStyle(
-        val topLeft: Char = '┌',
-        val topRight: Char = '┐',
-        val bottomLeft: Char = '└',
-        val bottomRight: Char = '┘',
-        val horizontal: Char = '─',
-        val vertical: Char = '│',
-        val topJoint: Char = '┬',
-        val middleJoint: Char = '┼',
-        val leftJoint: Char = '├',
-        val rightJoint: Char = '┤',
-        val bottomJoint: Char = '┴'
-    )
-
-    var border: BorderStyle = BorderStyle()
+    var border: BorderStyle = BorderStyle.Default
 
     fun row(block: Row.() -> Unit) {
         val row = Row()
@@ -52,7 +38,7 @@ class Table internal constructor() {
                 val contentLen = cell.content.length
                 val currentSpanWidth = (0 until span).sumOf { colWidths.getOrElse(cIndex + it) { 0 } }
                 if (contentLen > currentSpanWidth) {
-                    // Put deficit into the first column of the span for simplicity and speed.
+                    // Put the deficit into the first column of the span for simplicity and speed.
                     colWidths[cIndex] += contentLen - currentSpanWidth
                 }
                 cIndex += span
@@ -60,11 +46,11 @@ class Table internal constructor() {
         }
 
         // Helper lambdas for drawing lines
-        fun StringBuilder.drawBorder(left: Char, joint: Char, right: Char) {
+        fun StringBuilder.drawBorder(left: Char, joint: Char, right: Char, horizontal: Char) {
             append(left)
             for (i in 0 until columnCount) {
                 val segmentWidth = colWidths[i] + 2 * cellPadding
-                repeat(segmentWidth) { append(border.horizontal) }
+                repeat(segmentWidth) { append(horizontal) }
                 append(if (i == columnCount - 1) right else joint)
             }
         }
@@ -85,7 +71,7 @@ class Table internal constructor() {
             }
         }
 
-        fun StringBuilder.drawAdaptiveSeparator(upperMask: BooleanArray, lowerMask: BooleanArray) {
+        fun StringBuilder.drawAdaptiveSeparator(upperMask: BooleanArray, lowerMask: BooleanArray, border: BorderStyle.WithBorders) {
             // left edge
             append(border.leftJoint)
             // segments and joints between them
@@ -112,7 +98,7 @@ class Table internal constructor() {
         // Bottom border that adapts to the verticals present in the last content row.
         // Where the last row has a vertical at a boundary, we draw a bottomJoint (┴),
         // otherwise we continue the horizontal line (─) through that boundary.
-        fun StringBuilder.drawAdaptiveBottom(lastRowMask: BooleanArray) {
+        fun StringBuilder.drawAdaptiveBottom(lastRowMask: BooleanArray, border: BorderStyle.WithBorders) {
             append(border.bottomLeft)
             for (i in 0 until columnCount) {
                 val segmentWidth = colWidths[i] + 2 * cellPadding
@@ -130,12 +116,14 @@ class Table internal constructor() {
 
         return buildString {
             // Top border
-            drawBorder(border.topLeft, border.topJoint, border.topRight)
-            appendLine()
+            (border as? BorderStyle.WithBorders)?.let { border ->
+                drawBorder(border.topLeft, border.topJoint, border.topRight, border.horizontal)
+                appendLine()
+            }
 
             // Rows
             normalizedRows.forEachIndexed { rowIndex, row ->
-                append(border.vertical)
+                (border as? BorderStyle.WithBorders)?.let { border -> append(border.vertical) }
                 var cIndex = 0
                 row.forEach { cell ->
                     val span = maxOf(1, cell.colspan)
@@ -164,24 +152,30 @@ class Table internal constructor() {
                         repeat(remaining) { append(' ') }
                     }
                     // vertical border at the end of the span
-                    append(border.vertical)
+                    (border as? BorderStyle.WithBorders)?.let { border ->
+                        append(border.vertical)
+                    }
                     cIndex += span
                 }
 
-                if (rowIndex < normalizedRows.lastIndex) {
-                    appendLine()
-                    // Adaptive separator considering verticals in rows above/below (handles colspans)
-                    val upperMask = verticalMasks[rowIndex]
-                    val lowerMask = verticalMasks[rowIndex + 1]
-                    drawAdaptiveSeparator(upperMask, lowerMask)
-                    appendLine()
-                }
+                    if (rowIndex < normalizedRows.lastIndex) {
+                        appendLine()
+                        (border as? BorderStyle.WithBorders)?.let { border ->
+                            // Adaptive separator considering verticals in rows above/below (handles colspans)
+                            val upperMask = verticalMasks[rowIndex]
+                            val lowerMask = verticalMasks[rowIndex + 1]
+                            drawAdaptiveSeparator(upperMask, lowerMask, border)
+                            appendLine()
+                        }
+                    }
             }
 
             // Bottom border (adaptive to last row's vertical boundaries)
-            appendLine()
-            val lastMask = verticalMasks.last()
-            drawAdaptiveBottom(lastMask)
+            (border as? BorderStyle.WithBorders)?.let { border ->
+                appendLine()
+                val lastMask = verticalMasks.last()
+                drawAdaptiveBottom(lastMask, border)
+            }
         }
     }
 }

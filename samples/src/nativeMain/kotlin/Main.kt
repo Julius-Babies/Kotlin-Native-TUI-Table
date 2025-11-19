@@ -1,10 +1,9 @@
 import es.jvbabi.tui.table.buildTable
-import es.jvbabi.tui.table.components.Table
+import es.jvbabi.tui.table.components.BorderStyle
 
 fun main() {
     val table = buildTable {
-        cellPadding = 2
-
+        border = BorderStyle.Borderless
         row {
             cell { +"ID" }
             cell { +"Details" }
