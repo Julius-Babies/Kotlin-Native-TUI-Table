@@ -125,30 +125,31 @@ class Table internal constructor() {
             normalizedRows.forEachIndexed { rowIndex, row ->
                 (border as? BorderStyle.WithBorders)?.let { border -> append(border.vertical) }
                 var cIndex = 0
-                row.forEach { cell ->
+                row.forEachIndexed { i, cell ->
+                    val cellPaddingLeft = if (i == 0 && border is BorderStyle.Borderless) 0 else cellPadding
+                    val cellPaddingRight = if (i == row.lastIndex && border is BorderStyle.Borderless) 0 else cellPadding
+
                     val span = maxOf(1, cell.colspan)
                     // Inner width of the spanned cell should cover:
                     // - the inner widths of each spanned column (colWidth + 2*padding)
                     // - plus the widths of the skipped internal vertical separators (span - 1)
-                    val innerByColumns = (0 until span).sumOf { colWidths[cIndex + it] + 2 * cellPadding }
+                    val innerByColumns = (0 until span).sumOf { colWidths[cIndex + it] + cellPaddingLeft + cellPaddingRight }
                     val skippedSeparators = (span - 1)
                     val spanInnerWidth = innerByColumns + skippedSeparators
 
-                    // Berechne linke/rechte Auffüllung je nach Ausrichtung
-                    val baseLeftPad = cellPadding
-                    val baseRightPad = cellPadding
-                    val freeSpace = spanInnerWidth - cell.content.length - baseLeftPad - baseRightPad
+                    // Calculate left/right padding based on alignment
+                    val freeSpace = spanInnerWidth - cell.content.length - cellPaddingLeft - cellPaddingRight
                     if (cell.centered) {
                         val extraLeft = maxOf(0, freeSpace / 2)
                         val extraRight = maxOf(0, freeSpace - extraLeft)
-                        repeat(baseLeftPad + extraLeft) { append(' ') }
+                        repeat(cellPaddingLeft + extraLeft) { append(' ') }
                         append(cell.content)
-                        repeat(baseRightPad + extraRight) { append(' ') }
+                        repeat(cellPaddingRight + extraRight) { append(' ') }
                     } else {
-                        // Standard: links nur Padding, rest nach rechts
-                        repeat(baseLeftPad) { append(' ') }
+                        // Default: left padding only, rest to the right
+                        repeat(cellPaddingLeft) { append(' ') }
                         append(cell.content)
-                        val remaining = baseRightPad + maxOf(0, freeSpace)
+                        val remaining = cellPaddingRight + maxOf(0, freeSpace)
                         repeat(remaining) { append(' ') }
                     }
                     // vertical border at the end of the span
