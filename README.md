@@ -54,14 +54,14 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.julius-babies:table-tui:0.1.0")
+    implementation("io.github.julius-babies:table-tui:0.1.1")
 }
 ```
 
 #### Version Catalog
 ```toml
 [versions]
-table-tui = "0.1.0"
+table-tui = "0.1.1"
 
 [libraries]
 table-tui = { module = "io.github.julius-babies:table-tui", version.ref = "table-tui" }
