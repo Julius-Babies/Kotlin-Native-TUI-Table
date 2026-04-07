@@ -4,7 +4,10 @@ import util.buildStyledString
 
 fun main() {
     val table = buildTable {
-        border = BorderStyle.Borderless
+        border = BorderStyle.Default
+        row {
+            cell(colspan = 3) { +buildStyledString { green { underline { +"A colspan header" } } } }
+        }
         row {
             cell { +buildStyledString { bold { +"ID" } } }
             cell { +"Details" }
@@ -27,6 +30,9 @@ fun main() {
                 centered = true
                 +"✓"
             }
+        }
+        row {
+            cell(colspan = 3) { +buildStyledString { green { underline { +"A colspan footer" } } } }
         }
     }
 

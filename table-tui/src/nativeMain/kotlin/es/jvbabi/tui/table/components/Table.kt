@@ -45,16 +45,6 @@ class Table internal constructor() {
             }
         }
 
-        // Helper lambdas for drawing lines
-        fun StringBuilder.drawBorder(left: Char, joint: Char, right: Char, horizontal: Char) {
-            append(left)
-            for (i in 0 until columnCount) {
-                val segmentWidth = colWidths[i] + 2 * cellPadding
-                repeat(segmentWidth) { append(horizontal) }
-                append(if (i == columnCount - 1) right else joint)
-            }
-        }
-
         // Precompute, for each content row, where vertical borders exist at column boundaries.
         // A mask has size columnCount + 1 representing boundaries: 0 (left edge) ... columnCount (right edge).
         val verticalMasks: List<BooleanArray> = buildList(normalizedRows.size) {
@@ -117,7 +107,19 @@ class Table internal constructor() {
         return buildString {
             // Top border
             (border as? BorderStyle.WithBorders)?.let { border ->
-                drawBorder(border.topLeft, border.topJoint, border.topRight, border.horizontal)
+                val firstRowMask = verticalMasks[0]
+                append(border.topLeft)
+                for (i in 0 until columnCount) {
+                    val segmentWidth = colWidths[i] + 2 * cellPadding
+                    repeat(segmentWidth) { append(border.horizontal) }
+                    if (i == columnCount - 1) {
+                        append(border.topRight)
+                    } else {
+                        val boundaryIndex = i + 1
+                        val joint = if (firstRowMask[boundaryIndex]) border.topJoint else border.horizontal
+                        append(joint)
+                    }
+                }
                 appendLine()
             }
 
