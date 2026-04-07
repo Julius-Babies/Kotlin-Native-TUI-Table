@@ -35,7 +35,7 @@ class Table internal constructor() {
             var cIndex = 0
             row.forEach { cell ->
                 val span = maxOf(1, cell.colspan)
-                val contentLen = cell.content.length
+                val contentLen = cell.length()
                 val currentSpanWidth = (0 until span).sumOf { colWidths.getOrElse(cIndex + it) { 0 } }
                 if (contentLen > currentSpanWidth) {
                     // Put the deficit into the first column of the span for simplicity and speed.
@@ -130,15 +130,12 @@ class Table internal constructor() {
                     val cellPaddingRight = if (i == row.lastIndex && border is BorderStyle.Borderless) 0 else cellPadding
 
                     val span = maxOf(1, cell.colspan)
-                    // Inner width of the spanned cell should cover:
-                    // - the inner widths of each spanned column (colWidth + 2*padding)
-                    // - plus the widths of the skipped internal vertical separators (span - 1)
-                    val innerByColumns = (0 until span).sumOf { colWidths[cIndex + it] + cellPaddingLeft + cellPaddingRight }
-                    val skippedSeparators = (span - 1)
+                    // Inner width: sum of raw column widths + exactly one left + one right padding + skipped separators
+                    val innerByColumns = (0 until span).sumOf { colWidths[cIndex + it] } + cellPaddingLeft + cellPaddingRight
+                    val skippedSeparators = (span - 1) * (1 + cellPadding * 2)
                     val spanInnerWidth = innerByColumns + skippedSeparators
 
-                    // Calculate left/right padding based on alignment
-                    val freeSpace = spanInnerWidth - cell.content.length - cellPaddingLeft - cellPaddingRight
+                    val freeSpace = spanInnerWidth - cell.length() - cellPaddingLeft - cellPaddingRight
                     if (cell.centered) {
                         val extraLeft = maxOf(0, freeSpace / 2)
                         val extraRight = maxOf(0, freeSpace - extraLeft)
@@ -159,16 +156,16 @@ class Table internal constructor() {
                     cIndex += span
                 }
 
-                    if (rowIndex < normalizedRows.lastIndex) {
+                if (rowIndex < normalizedRows.lastIndex) {
+                    appendLine()
+                    (border as? BorderStyle.WithBorders)?.let { border ->
+                        // Adaptive separator considering verticals in rows above/below (handles colspans)
+                        val upperMask = verticalMasks[rowIndex]
+                        val lowerMask = verticalMasks[rowIndex + 1]
+                        drawAdaptiveSeparator(upperMask, lowerMask, border)
                         appendLine()
-                        (border as? BorderStyle.WithBorders)?.let { border ->
-                            // Adaptive separator considering verticals in rows above/below (handles colspans)
-                            val upperMask = verticalMasks[rowIndex]
-                            val lowerMask = verticalMasks[rowIndex + 1]
-                            drawAdaptiveSeparator(upperMask, lowerMask, border)
-                            appendLine()
-                        }
                     }
+                }
             }
 
             // Bottom border (adaptive to last row's vertical boundaries)
